@@ -132,6 +132,7 @@ app.layout = html.Div([
                     style={'height': '100%'}
                 ),
                 style={'backgroundColor': '#f1f1f1', 'padding': '20px'},
+
             ),
             html.Div(
                 children=[
