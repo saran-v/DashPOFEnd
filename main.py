@@ -14,7 +14,7 @@ import csv
 import plotly.express as px
 from dash.exceptions import PreventUpdate
 import pyodbc
-from datetime import datetime
+from datetime import datetime as date
 import numpy as np
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
@@ -132,13 +132,12 @@ app.layout = html.Div([
                     style={'height': '100%'}
                 ),
                 style={'backgroundColor': '#f1f1f1', 'padding': '20px'},
-
             ),
             html.Div(
                 children=[
                     html.Br(),
                     html.Div(
-                        style={'display': 'grid', 'grid-template-columns': "50% 50%", 'border': 'None',
+                        style={'display': 'grid', 'grid-template-columns': "40% 40% 20%", 'border': 'None',
                                'grid-gap': '10px', 'font-family': 'Helvetica', 'background': '#E8E8E8'},
                         children=[
                             html.Div([
@@ -155,6 +154,14 @@ app.layout = html.Div([
                                 dcc.Dropdown(
                                     id='family-code-dropdown', className='dropdown-class',
                                     placeholder="Select a family code", persistence=True, persistence_type='memory',
+                                    style={'font-family': 'Helvetica', 'width': '90%', 'margin': '0 auto',
+                                           'color': 'black', 'borderColor': '#6B9AC4'},
+                                ),
+                            ]),
+                            html.Div([
+                                dcc.Dropdown(
+                                    id='site-fc-dropdown', className='dropdown-class',
+                                    placeholder="Select a site", persistence=True, persistence_type='memory',
                                     style={'font-family': 'Helvetica', 'width': '90%', 'margin': '0 auto',
                                            'color': 'black', 'borderColor': '#6B9AC4'},
                                 ),
@@ -266,26 +273,48 @@ page_1_layout = html.Div([
                                      dcc.Download(id="download_po"),
                                      html.Br(),
                                      html.Br(),
-                                     html.Div(
-                                         style={'display': 'grid', 'grid-template-columns': "20% 50%", 'border': 'None',
-                                                'grid-gap': '10px', 'font-family': 'Helvetica',
-                                                'background': '#E8E8E8'}, children=[
-                                             dcc.Input(id="number-of-weeks", type="number",
-                                                       placeholder="Number of weeks", min=0,
-                                                       # Set the minimum value to 0
-                                                       step=1, value=4, readOnly=True,
-                                                       style={'margin': '0 0 0 5px', 'width': '220px', 'height': "30px",
-                                                              'border-radius': '5px', 'border': '#1f77b4',
-                                                              'text-align': 'center', 'display': 'flex'}),
-                                             html.Button('Generate SAP Files', id='sap-btn', n_clicks=0,
-                                                         style={'fontWeight': 'bold', 'display': 'inline-block',
-                                                                'margin': '3px 0 0 0',
-                                                                'vertical-align': 'middle', "width": "200px",
-                                                                'height': "25px",
-                                                                'backgroundColor': '#1f77b4',
-                                                                'color': 'white', 'border': '0px',
-                                                                'border-radius': '5px',
-                                                                'cursor': 'pointer'}), dcc.Download(id="download")]),
+                                     # dcc.DatePickerSingle(
+                                     #     id='date-picker-download1',
+                                     #     # min_date_allowed=date(2020, 8, 5),
+                                     #     # max_date_allowed=date(2030, 9, 19),
+                                     #     # initial_visible_month=date(2017, 8, 5),
+                                     #     # date=date(2017, 8, 25)
+                                     # ),
+                                     html.Br(),
+                                     html.Br(),
+                                     html.Div(style={'display': 'grid', 'grid-template-columns': "5% 13% 10%",
+                                                     'border': 'None',
+                                                     'grid-gap': '10px', 'font-family': 'Helvetica',
+                                                     'background': '#E8E8E8'}, children=[
+                                         dcc.Input(id='numWeeks', type="number", placeholder="Number of weeks", min=0,
+                                                   # Set the minimum value to 0
+                                                   step=1, value=4, readOnly=False,
+                                                   style={'margin': '1 0 0 0px', 'width': '100px', 'height': "30px",
+                                                          'border-radius': '5px', 'border': '#1f77b4',
+                                                          'text-align': 'center', 'display': 'flex'}),
+                                         dcc.Input(id="dload-date", type="text", placeholder="Date (MM/DD/YY)",
+                                                   # Set the minimum value to 0
+                                                   step=1, persistence=True, persistence_type='memory',
+                                                   style={'margin': '0 auto', 'width': '180px', 'height': "30px",
+                                                          'border-radius': '5px', 'border': '#1f77b4',
+                                                          'text-align': 'center', 'display': 'flex',
+                                                          'justifyContent': 'center',
+                                                          'alignItems': 'center'}),
+                                         # dcc.DatePickerSingle(
+                                         #         id='date-picker-download',
+                                         #         # min_date_allowed=date(2020, 8, 5),
+                                         #         # max_date_allowed=date(2030, 9, 19),
+                                         #         # initial_visible_month=date(2017, 8, 5),
+                                         #         # date=date(2017, 8, 25)
+                                         # ),
+                                         html.Button('Generate SAP Files', id='sap-btn', n_clicks=0,
+                                                     style={'fontWeight': 'bold', 'display': 'inline-block',
+                                                            'margin': '3px 0 0 0',
+                                                            'vertical-align': 'middle', "width": "200px",
+                                                            'height': "25px",
+                                                            'backgroundColor': '#1f77b4',
+                                                            'color': 'white', 'border': '0px', 'border-radius': '5px',
+                                                            'cursor': 'pointer'}), dcc.Download(id="download")]),
                                      html.Div(id='output1'),
                                      html.Br(),
                                      html.Div(
@@ -380,6 +409,12 @@ page_1_layout = html.Div([
                                  row_deletable=True,
                                  style_cell={'textAlign': 'center', 'fontSize': 14, 'font-family': 'Helvetica'},
                                  style_header={'backgroundColor': '#1f77b4', 'fontWeight': 'bold', 'color': 'white'},
+                                 style_data_conditional=[
+                                     {
+                                         'if': {'column_id': 'PO_Week_Date'},
+                                         # 'backgroundColor': 'red',
+                                         'color': 'blue',
+                                     }],
                                  style_table={'overflowX': 'scroll'},
                                  sort_action='native',
                                  sort_mode='multi',
@@ -449,6 +484,12 @@ page_1_layout = html.Div([
                                  filter_action='native',
                                  style_cell={'textAlign': 'center', 'fontSize': 14, 'font-family': 'Helvetica'},
                                  style_header={'backgroundColor': '#1f77b4', 'fontWeight': 'bold', 'color': 'white'},
+                                 style_data_conditional=[
+                                     {
+                                         'if': {'column_id': 'POs'},
+                                         # 'backgroundColor': 'red',
+                                         'color': 'blue',
+                                     }],
                                  style_table={'overflowX': 'scroll'},
                                  sort_action='native',
                                  sort_mode='multi',
@@ -657,6 +698,23 @@ def update_family_code_dropdown(vendor_name):
     return options
 
 
+@app.callback(
+    Output('site-fc-dropdown', 'options'),
+    Input('family-code-dropdown', 'value'))
+def update_sitedropdown(family_code):
+    print('family_code', family_code)
+    conn_site = pyodbc.connect(
+        'Driver={SQL Server};' + 'Server=' + configDict['server'] + ';' + 'Database=' + configDict['db'] + ';'
+        + 'Trusted_Connection=yes;')
+
+    query1 = "SELECT [Site] FROM " + configDict[
+        'po_data_summary'] + " where Planner = ? and Family_Code = ?;"  # " where Planner = ?;"
+    df = pd.read_sql(query1, conn_site, params=[username, family_code])
+    options = [{'label': i, 'value': i} for i in df['Site'].unique()]
+    options.insert(0, {'label': 'All', 'value': 'All'})
+    return options
+
+
 # Callback function for grouping vendor values corresponding to the selected planner value
 @app.callback(
     Output('vendor-name-dropdown', 'options'),
@@ -694,17 +752,28 @@ def update_vendor_name_dropdown(data):
 # Callback function for downloading SAP csv file
 @app.callback(
     Output('download', 'data'),
-    Input('sap-btn', 'n_clicks'), Input('vendor-name-dropdown', 'value'), Input('family-code-dropdown', 'value'))
-def download_sap_data(n_clicks, vendor_name, family_code):
+    Input('sap-btn', 'n_clicks'), Input('vendor-name-dropdown', 'value'),
+    Input('family-code-dropdown', 'value'), Input('numWeeks', 'value'),
+    Input('site-fc-dropdown', 'value'), Input('dload-date', 'value'))
+def download_sap_data(n_clicks, vendor_name, family_code, numWeeks, site_select, date_value):
     if n_clicks > 0:
         conn1 = pyodbc.connect(
             'Driver={SQL Server};' + 'Server=' + configDict['server'] + ';' + 'Database=' + configDict['db'] + ';'
             + 'Trusted_Connection=yes;')
-        query1 = "SELECT [RunDate],[Planner],[ItemGroup],[Family_Code],[Item],[Site],[Article_Desc],[Vendor_Id],[Vendor_Name],[PO_index]," \
-                 "[PO_Week_Date],[PO_Week],[PO_Year],[POs],[Item_Volume],[Volume],[Wos],[PO_Volume],[SS_Weeks],[WOS_SS_Ratio] FROM " + \
-                 configDict['po_data_summary'] + \
-                 " where Vendor_Name = ? and Family_Code = ?;"  # " where Planner = ?;"
-        df = pd.read_sql(query1, conn1, params=[vendor_name, family_code])
+
+        if site_select == 'All':
+            query1 = "SELECT [RunDate],[Planner],[ItemGroup],[Family_Code],[Item],[Site],[Article_Desc],[Vendor_Id],[Vendor_Name],[PO_index]," \
+                     "[PO_Week_Date],[PO_Week],[PO_Year],[POs],[Item_Volume],[Volume],[Wos],[PO_Volume],[SS_Weeks],[WOS_SS_Ratio],[WK_AFTER_LT] FROM " + \
+                     configDict['po_data_summary'] + \
+                     " where Vendor_Name = ? and Family_Code = ?;"  # " where Planner = ?;"
+            df = pd.read_sql(query1, conn1, params=[vendor_name, family_code])
+        else:
+            query1 = "SELECT [RunDate],[Planner],[ItemGroup],[Family_Code],[Item],[Site],[Article_Desc],[Vendor_Id],[Vendor_Name],[PO_index]," \
+                     "[PO_Week_Date],[PO_Week],[PO_Year],[POs],[Item_Volume],[Volume],[Wos],[PO_Volume],[SS_Weeks],[WOS_SS_Ratio],[WK_AFTER_LT] FROM " + \
+                     configDict['po_data_summary'] + \
+                     " where Vendor_Name = ? and Family_Code = ? and site = ?;"  # " where Planner = ?;"
+            df = pd.read_sql(query1, conn1, params=[vendor_name, family_code, site_select])
+
         df.to_csv(r"model_output.csv", index=False)
         if os.path.isfile("results_java.txt"):
             os.remove("results_java.txt")
@@ -713,6 +782,27 @@ def download_sap_data(n_clicks, vendor_name, family_code):
         # java is still running
         while not os.path.exists('results_java.txt'):
             time.sleep(1)
+
+        print("numWeeks:", numWeeks)
+        dfPd = pd.read_csv('PoData.csv')
+        print(dfPd, ' len(df.index):', len(df.index), ' df[df.columns[0]].count():', df[df.columns[0]].count())
+        print('dfPd1:', dfPd)
+        print('date_value:', date_value)
+
+        if date_value is not None:
+            dload_time = datetime.strptime(date_value, '%m/%d/%y')
+            dfPd['Date'] = pd.to_datetime(dfPd['Date'], format='%Y-%m-%d')
+            print('dfPdx:', dfPd, ' dload_time: ', dload_time)
+            dfPd = dfPd.loc[(dfPd['Date'] <= dload_time)]
+        else:
+            dfPd['Wk_Af_LT'] = dfPd['Wk_Af_LT'].astype('int')  # , errors='ignore')
+            dfPd = dfPd[dfPd['Wk_Af_LT'] <= int(numWeeks)]
+
+        dfPd.drop('Wk_Af_LT', axis=1, inplace=True)
+
+        print('dfPd2:', dfPd)
+        dfPd.to_csv(r"PoData.csv", index=False)
+
         return dcc.send_file('PoData.csv')
         # return dcc.send_data_frame(df.to_csv, filename="data_n.csv")
     # else:
@@ -725,42 +815,56 @@ def download_sap_data(n_clicks, vendor_name, family_code):
     Output('dateValue', 'children'),
     Output('site-dropdown', 'options'),
     Output('fc-dropdown', 'options'),
-    Input('vendor-name-dropdown', 'value'), Input('family-code-dropdown', 'value'))
-def update_summary_table(vendor_name, family_code):
-    if vendor_name is None or family_code is None:
+    Input('vendor-name-dropdown', 'value'), Input('family-code-dropdown', 'value'), Input('site-fc-dropdown', 'value'))
+def update_summary_table(vendor_name, family_code, site_select):
+    if vendor_name is None or family_code is None or site_select is None:
         return [], '', [], []
-    else:
-        conn2 = pyodbc.connect(
-            'Driver={SQL Server};' + 'Server=' + configDict['server'] + ';' + 'Database=' + configDict['db'] + ';'
-            + 'Trusted_Connection=yes;')
+
+    conn2 = pyodbc.connect(
+        'Driver={SQL Server};' + 'Server=' + configDict['server'] + ';' + 'Database=' + configDict['db'] + ';'
+        + 'Trusted_Connection=yes;')
+
+    global df
+    if site_select == 'All':
         query1 = "SELECT [RunDate],[Planner],[ItemGroup],[Family_Code],[Item],[Site],[Article_Desc],[Vendor_Id],[Vendor_Name],[PO_index]," \
                  "[PO_Week_Date],[PO_Week],[PO_Year],[POs],[Item_Volume],[Volume],[Wos],[WOS_SS_Ratio],[PO_Volume] FROM " + \
                  configDict['po_data_summary'] + \
                  " where Vendor_Name = ? and Family_Code = ?;"  # " where Planner = ?;"
-        global df
+
         df = pd.read_sql(query1, conn2, params=[vendor_name, family_code])
-        # df.to_csv('data.csv')
-        dateValue = df.iloc[0][0]
-        print('new df formed')
-        # print(df)
-        print('dateValue:', dateValue)
-        date_time_obj = str(dateValue).partition('.')[0]
-        print('text', date_time_obj)
-        date_time_obj = datetime.strptime(str(date_time_obj), '%Y-%m-%d %H:%M:%S')
-        options_site = [{'label': i, 'value': i} for i in df['Site'].unique()]
-        options_site.insert(0, {'label': 'All', 'value': 'All'})
-        options_fc = [{'label': i, 'value': i} for i in df['Family_Code'].unique()]
-        options_fc.insert(0, {'label': 'All', 'value': 'All'})
-        method = html.Div([
-            html.H3('Latest RunDate : {}'.format(date_time_obj.strftime('%m/%d/%Y')),
-                    style={'textAlign': 'center', 'fontSize': 14, 'font-family': 'Helvetica'})])
-        summary_df = df.groupby(['Site', 'Family_Code', 'PO_Week_Date']).agg(
-            {'WOS_SS_Ratio': ['mean', 'max', 'min'], 'PO_index': 'nunique'}).reset_index()
-        summary_df.columns = summary_df.columns.droplevel(0)
-        summary_df.columns = ['Site', 'Family_Code', 'PO_Week_Date', 'Wos_ss_r_mean', 'Wos_ss_r_max', 'Wos_ss_r_min',
-                              'PO_index_count']
-        summary_df = summary_df.reset_index().rename(columns={"index": "id"})
-        return summary_df.round(2).to_dict('records'), method, options_site, options_fc
+    else:
+        query1 = "SELECT [RunDate],[Planner],[ItemGroup],[Family_Code],[Item],[Site],[Article_Desc],[Vendor_Id],[Vendor_Name],[PO_index]," \
+                 "[PO_Week_Date],[PO_Week],[PO_Year],[POs],[Item_Volume],[Volume],[Wos],[WOS_SS_Ratio],[PO_Volume] FROM " + \
+                 configDict['po_data_summary'] + \
+                 " where Vendor_Name = ? and Family_Code = ? and site = ?;"  # " where Planner = ?;"
+
+        df = pd.read_sql(query1, conn2, params=[vendor_name, family_code, site_select])
+
+    # df.to_csv('data.csv')
+    dateValue = df.iloc[0][0]
+    df['PO_Week_Date'] = pd.to_datetime(df['PO_Week_Date'])
+    df['PO_Week_Date'] = df['PO_Week_Date'].dt.strftime('%m-%d-%Y')
+    df['Item'] = df['Item'].astype(str)
+    print('new df formed')
+    # print(df)
+    print('dateValue:', dateValue)
+    date_time_obj = str(dateValue).partition('.')[0]
+    print('text', date_time_obj)
+    date_time_obj = datetime.strptime(str(date_time_obj), '%Y-%m-%d %H:%M:%S')
+    options_site = [{'label': i, 'value': i} for i in df['Site'].unique()]
+    options_site.insert(0, {'label': 'All', 'value': 'All'})
+    options_fc = [{'label': i, 'value': i} for i in df['Family_Code'].unique()]
+    options_fc.insert(0, {'label': 'All', 'value': 'All'})
+    method = html.Div([
+        html.H3('Latest RunDate : {}'.format(date_time_obj.strftime('%m/%d/%Y')),
+                style={'textAlign': 'center', 'fontSize': 14, 'font-family': 'Helvetica'})])
+    summary_df = df.groupby(['Site', 'Family_Code', 'PO_Week_Date']).agg(
+        {'WOS_SS_Ratio': ['mean', 'max', 'min'], 'PO_index': 'nunique'}).reset_index()
+    summary_df.columns = summary_df.columns.droplevel(0)
+    summary_df.columns = ['Site', 'Family_Code', 'PO_Week_Date', 'Wos_ss_r_mean', 'Wos_ss_r_max', 'Wos_ss_r_min',
+                          'PO_index_count']
+    summary_df = summary_df.reset_index().rename(columns={"index": "id"})
+    return summary_df.round(2).to_dict('records'), method, options_site, options_fc
 
 
 @app.callback(
@@ -966,7 +1070,7 @@ def update_details_table(active_cell, summary_table_data, time, data, df_edited,
         PO_index = summary_table_data[active_cell['row']]['PO_index']
         key_new_value = str(Date) + '_' + str(Location) + '_' + str(PO_index)
         print(key_new_value)
-    print('Time:', time)
+        print('Time:', time)
     if (active_cell is not None) & (time is None):
         print('comes in-3')
         # selected_item_group = summary_table_data[active_cell['row']]['ItemGroup']
@@ -975,6 +1079,7 @@ def update_details_table(active_cell, summary_table_data, time, data, df_edited,
         PO_index = summary_table_data[active_cell['row']]['PO_index']
         details_data = df[(df['PO_Week_Date'] == Date) & (df['Site'] == Location) & (
                 df['PO_index'] == PO_index)]
+        df['Item'] = df['Item'].astype(str)
         return details_data.round(2).to_dict('records'), None, key_new_value
     elif (active_cell is not None) & (key_new_value != key_string):
         print('comes in-4')
@@ -984,6 +1089,7 @@ def update_details_table(active_cell, summary_table_data, time, data, df_edited,
         PO_index = summary_table_data[active_cell['row']]['PO_index']
         details_data = df[(df['PO_Week_Date'] == Date) & (df['Site'] == Location) & (
                 df['PO_index'] == PO_index)]
+        details_data['Item'] = details_data['Item'].astype(str)
         return details_data.round(2).to_dict('records'), None, key_new_value
     elif (time is not None) & (data != []) & (data_previous is not None):
         print('comes in-5')
@@ -1009,6 +1115,7 @@ def update_details_table(active_cell, summary_table_data, time, data, df_edited,
         print('data', data)
         current_data['PO_Volume'] = round(sum(int(row['POs']) * int(row['Item_Volume']) for row in data))
         current_data['Volume'] = [round(int(row['POs']) * (int(row['Item_Volume']))) for row in data]
+        current_data['Item'] = current_data['Item'].astype(str)
         return current_data.to_dict('records'), df_edited, key_new_value
     else:
         return [], [], ''
@@ -1196,17 +1303,23 @@ def display_selected_cell(active_cell, table_data):
 @app.callback(
     Output('download_excep', 'data'),
     Input('Download-excep-btn', 'n_clicks'), Input('vendor-name-dropdown', 'value'),
-    Input('family-code-dropdown', 'value'))
-def download_excep_data(n_clicks, vendor_name, family_code):
+    Input('family-code-dropdown', 'value'), Input('site-fc-dropdown', 'value'))
+def download_excep_data(n_clicks, vendor_name, family_code, site_select):
     if n_clicks > 0:
         conn1 = pyodbc.connect(
             'Driver={SQL Server};' + 'Server=' + configDict['server'] + ';' + 'Database=' + configDict['db'] + ';'
             + 'Trusted_Connection=yes;')
 
-        query1 = "SELECT * from " + configDict['wos_summary'] + "_" + configDict[
-            vendor_name.lower()] + "] where Vendor_Name = ? and Family_Code = ?;"
-        df = pd.read_sql(query1, conn1, params=[vendor_name, family_code])
-        fileName = "Exception_data_" + vendor_name + "_" + family_code + ".csv";
+        if site_select == 'All':
+            query1 = "SELECT * from " + configDict['wos_summary'] + "_" + configDict[
+                vendor_name.lower()] + "] where Vendor_Name = ? and Family_Code = ?;"
+            df = pd.read_sql(query1, conn1, params=[vendor_name, family_code])
+        else:
+            query1 = "SELECT * from " + configDict['wos_summary'] + "_" + configDict[
+                vendor_name.lower()] + "] where Vendor_Name = ? and Family_Code = ? and site = ?;"
+            df = pd.read_sql(query1, conn1, params=[vendor_name, family_code, site_select])
+
+        fileName = "Exception_data_" + vendor_name + "_" + family_code + "_" + site_select + ".csv";
         df.to_csv(fileName, index=False)
         return dcc.send_file(fileName)
 
@@ -1214,16 +1327,22 @@ def download_excep_data(n_clicks, vendor_name, family_code):
 @app.callback(
     Output('download_po', 'data'),
     Input('download-po-btn', 'n_clicks'), Input('vendor-name-dropdown', 'value'),
-    Input('family-code-dropdown', 'value'))
-def download_po_data(n_clicks, vendor_name, family_code):
+    Input('family-code-dropdown', 'value'), Input('site-fc-dropdown', 'value'))
+def download_po_data(n_clicks, vendor_name, family_code, site_select):
     if n_clicks > 0:
         conn1 = pyodbc.connect(
             'Driver={SQL Server};' + 'Server=' + configDict['server'] + ';' + 'Database=' + configDict['db'] + ';'
             + 'Trusted_Connection=yes;')
 
-        query1 = "SELECT * from " + configDict['po_data_summary'] + " where Vendor_Name = ? and Family_Code = ?;"
-        df = pd.read_sql(query1, conn1, params=[vendor_name, family_code])
-        fileName = "PO_Data_Summary_Out_Master_DB_" + vendor_name + "_" + family_code + ".csv";
+        if site_select == 'All':
+            query1 = "SELECT * from " + configDict['po_data_summary'] + " where Vendor_Name = ? and Family_Code = ?;"
+            df = pd.read_sql(query1, conn1, params=[vendor_name, family_code])
+        else:
+            query1 = "SELECT * from " + configDict[
+                'po_data_summary'] + " where Vendor_Name = ? and Family_Code = ? and site = ?;"
+            df = pd.read_sql(query1, conn1, params=[vendor_name, family_code, site_select])
+
+        fileName = "PO_Data_Summary_Out_Master_DB_" + vendor_name + "_" + family_code + "_" + site_select + ".csv";
         df.to_csv(fileName, index=False)
         return dcc.send_file(fileName)
 
@@ -1242,17 +1361,24 @@ def download_po_data(n_clicks, vendor_name, family_code):
     Input('intermediate-valueM', 'data'),
     Input('intermediate-value-sum', 'data'),
     Input('vendor-name-dropdown', 'value'),
-    Input('family-code-dropdown', 'value'))
+    Input('family-code-dropdown', 'value'), Input('site-fc-dropdown', 'value'))
 def save_changes(n_clicks0, n_clicks1, n_clicks2, n_clicks3, df_deleted, df_edited, df_edit_summ, df_sum_deleted,
-                 vendor_name, family_code):
+                 vendor_name, family_code, site_select):
     print("Yes entered- Save Changes!!")
     print(n_clicks1, n_clicks2, n_clicks3)
     conn3 = pyodbc.connect(
         'Driver={SQL Server};' + 'Server=' + configDict['server'] + ';' + 'Database=' + configDict['db'] + ';'
         + 'Trusted_Connection=yes;')
     if (n_clicks0 == 1):
-        delete_query = " DELETE FROM " + configDict['po_data_summary'] + " WHERE Vendor_Name = ? and Family_Code = ?"
-        cursor.execute(delete_query, (vendor_name, family_code))
+        if site_select == 'All':
+            delete_query = " DELETE FROM " + configDict[
+                'po_data_summary'] + " WHERE Vendor_Name = ? and Family_Code = ?"
+            cursor.execute(delete_query, (vendor_name, family_code))
+        else:
+            delete_query = " DELETE FROM " + configDict[
+                'po_data_summary'] + " WHERE Vendor_Name = ? and Family_Code = ? and site = ?"
+            cursor.execute(delete_query, (vendor_name, family_code, site_select))
+
         conn3.commit()
     if (n_clicks1 == 1):
         print('df_sum_delete-write file')
@@ -1386,34 +1512,6 @@ def save_changes(n_clicks0, n_clicks1, n_clicks2, n_clicks3, df_deleted, df_edit
     return 0, 0, 0
 
 
-# @app.callback(Output('output1', 'children'),
-#               [Input('discard-button1', 'n_clicks')])
-# def delete_files1(n_clicks):
-#     if n_clicks:
-#         try:
-#             os.remove('removed_data_{}.csv'.format(username))
-#             os.remove('edited_data_{}.csv'.format(username))
-#             return 'Files deleted successfully!'
-#         except Exception as e:
-#             return f'Error deleting files: {e}'
-# @app.callback(Output('output2', 'children'),
-#               [Input('discard-button2', 'n_clicks')])
-# def delete_files2(n_clicks):
-#     if n_clicks:
-#         try:
-#             os.remove('removed_data_{}.csv'.format(username))
-#             return 'Files deleted successfully!'
-#         except Exception as e:
-#             return f'Error deleting files: {e}'
-# @app.callback(Output('output3', 'children'),
-#               [Input('discard-button3', 'n_clicks')])
-# def delete_files3(n_clicks):
-#     if n_clicks:
-#         try:
-#             os.remove('removed_data_{}.csv'.format(username))
-#             return 'Files deleted successfully!'
-#         except Exception as e:
-#             return f'Error deleting files: {e}'
 page_2_layout = html.Div(
     style={
         'backgroundColor': '#1f1f1f',
@@ -1431,48 +1529,6 @@ page_2_layout = html.Div(
 )
 
 
-# tab_2_layout = html.Div(style={'border': 'none', 'background': '#E8E8E8', 'minHeight': '100vh'}, children=[
-#     # html.Br(),
-#     html.Br(),
-#     html.Div(style={'border': 'none', 'margin': '0 20px'}, children=[
-#         dash_table.DataTable(
-#             id='exception-table',
-#             columns=[{"name": i, "id": i} for i in exception_df.columns],
-#             style_cell={'textAlign': 'center', 'fontSize': 14, 'font-family': 'Helvetica'},
-#             style_header={'backgroundColor': '#1f77b4', 'fontWeight': 'bold+', 'color': 'white'},
-#             style_table={'overflowX': 'scroll'},
-#             filter_action='native',
-#             sort_action='native',
-#             sort_mode='multi',
-#             css=[hover_style],
-#             page_size=10
-#         ),
-#     ]),
-#     html.Div(id='plot-data-out'),
-#     html.Br(),
-#     html.Div(
-#         style={'border': 'none', 'margin': '0 20px'},
-#         children=[
-#             html.Br(),
-#             html.Div(style={'margin': '0 20px'}, children=[
-#                 dcc.Dropdown(
-#                     id='graph-type-e', persistence = True, persistence_type = 'memory',
-#                     options=[
-#                         {'label': 'Histogram', 'value': 'Histogram'},
-#                         {'label': 'Line Graph', 'value': 'Line Graph'},
-#                     ],
-#                     value='Line Graph',
-#                     placeholder="Select the trace type",
-#                     style={'width': '50%', 'font-family': 'Helvetica', 'borderColor': '#6B9AC4'}
-#                 ),
-#             ]),
-#             html.Br(),
-#             html.Div([
-#                 dcc.Graph(id='wos-graph-e'),
-#             ]),
-#         ]),
-#     html.Br()
-# ])
 @app.callback(
     Output('plot-data-out1', 'children'),
     Input('exception-table1', 'active_cell'),
@@ -1568,25 +1624,29 @@ def display_selected_cell(active_cell, table_data):
 
 
 @app.callback(Output('exception-table1', 'data'), Output('exception-table1', 'columns'),
-              Output('exception-table1', 'style_data_conditional'), Output('exception-table2', 'data'),
-              Input('vendor-name-dropdown', 'value'), Input('family-code-dropdown', 'value'))
-def loadExceptionTable(vendorName, family_code):
+              Output('exception-table1', 'style_data_conditional'),
+              Output('exception-table2', 'data'), Input('vendor-name-dropdown', 'value'),
+              Input('family-code-dropdown', 'value'),
+              Input('site-fc-dropdown', 'value'))
+def loadExceptionTable(vendorName, family_code, site_select):
     excep_data = exception_df[
         (exception_df['Vendor_Name'] == vendorName) & (exception_df['Family_Code'] == family_code)]
-    excep_data.drop('Vendor_Name', axis=1, inplace=True)
-    excep_data.drop('Family_Code', axis=1, inplace=True)
+    # excep_data.drop('Vendor_Name', axis=1, inplace=True)
+    # excep_data.drop('Family_Code', axis=1, inplace=True)
 
     conn1 = pyodbc.connect(
         'Driver={SQL Server};' + 'Server=' + configDict['server'] + ';' + 'Database=' + configDict['db'] + ';'
         + 'Trusted_Connection=yes;')
 
-    # print('vendorName:',vendorName,' lower:',vendorName.lower(),':')
-    # print('configDict[vendorName]:',configDict[vendorName.lower()],':')
-    # query1 = "SELECT * from " + configDict['wos_summary'] + "_" + configDict[vendorName] + "] where Vendor_Name = ? and Family_Code = ?;"
-    query1 = "SELECT * from " + configDict['wos_summary'] + "_" + configDict[
-        vendorName.lower()] + "] where Vendor_Name = ? and Family_Code = ?;"
-    wos_df = pd.read_sql(query1, conn1, params=[vendorName, family_code])
-    # wos_df = pd.read_sql(query1, conn1)
+    if site_select == 'All':
+        query1 = "SELECT * from " + configDict['wos_summary'] + "_" + configDict[
+            vendorName.lower()] + "] where Vendor_Name = ? and Family_Code = ?;"
+        wos_df = pd.read_sql(query1, conn1, params=[vendorName, family_code])
+    else:
+        query1 = "SELECT * from " + configDict['wos_summary'] + "_" + configDict[
+            vendorName.lower()] + "] where Vendor_Name = ? and Family_Code = ? and Site = ?;"
+        wos_df = pd.read_sql(query1, conn1, params=[vendorName, family_code, site_select])
+
     # print(wos_df)
     lt_days_list = wos_df['Lead_Time_Days'].tolist()
     lt_days_list = [x / 7 for x in lt_days_list]
@@ -1594,14 +1654,9 @@ def loadExceptionTable(vendorName, family_code):
     wos_df.insert(6, "Lead_Time_Weeks", lt_days_list)
     wos_df.Lead_Time_Weeks = wos_df.Lead_Time_Weeks.round(2)
 
-    # wos_df = wos_df[wos_df['Vendor_Name'] == vendorName]
-    # df = pd.read_sql(query1, conn1, params=[vendorName, family_code])
     columnName = list(wos_df.columns.values)
 
     column_map = {}
-    # # for i in range(0,7):
-    # #     column_map[columnName[i]] = columnName[i]
-    # #
     for i in range(8, len(columnName)):
         column_map[columnName[i]] = columnName[i] + '_' + 'W' + str(i - 7)
 
@@ -1611,29 +1666,10 @@ def loadExceptionTable(vendorName, family_code):
     for i in range(8, len(columnName)):
         colN.append(columnName[i] + '_' + 'W' + str(i - 7))  # column_map[columnName[i]] = 'a' + columnName[i]
 
-    # #print('colN:',colN)
-
-    # # styles = [{
-    # #     'if': {
-    # #         'filter_query': '{} > num(0.0)'.format(x),
-    # #         'column_id': str(x)
-    # #     },
-    # #     'color': 'red',
-    # # } for x in colN] # range(date.today().year - 6, date.today().year + 1)]
-
     styles = [{
-        'if': {'column_id': str(x), 'filter_query': '{{{0}}} >= 0 && {{{0}}} <= 2'.format(x)},
+        'if': {'column_id': str(x), 'filter_query': '{{{0}}} < {{Weekly_Safety_Stock}}'.format(x)},
         'color': 'red',
     } for x in colN]
-
-    # print('styles:', styles)
-    # styles = [{
-    #     'if': {
-    #         'filter_query': '{} > num(0.0)'.format(x),
-    #         'column_id': str(x)
-    #     },
-    #     'color': 'red',
-    # } for x in colN] # range(date.today().year - 6, date.today().year + 1)]
 
     # Calculate the index of the 'Weekly_Safety_Stock' column in the data
     weekly_safety_stock_column_index = wos_df.columns.get_loc('Weekly_Safety_Stock')
@@ -1641,18 +1677,7 @@ def loadExceptionTable(vendorName, family_code):
     # Create a list of column names for columns occurring after Weekly_Safety_Stock
     columns_after_weekly_safety_stock = wos_df.columns[weekly_safety_stock_column_index + 1:]
     print(columns_after_weekly_safety_stock)
-    # Define the condition to check if any value in columns_after_weekly_safety_stock is less than Weekly_Safety_Stock
-    condition = ' || '.join(
-        ['{{{0}}} < {{{1}}}'.format(col, 'Weekly_Safety_Stock') for col in columns_after_weekly_safety_stock])
-    # row_style = {
-    #     'if': {
-    #         'filter_query': condition,
-    #     },
-    #     'color': 'red',
-    # }
-    #
-    # # Add the row_style to the style_data_conditional list
-    # styles = [row_style]
+
     columnNames = [{'name': i, 'id': i} for i in wos_df.columns]
     return wos_df.to_dict("records"), columnNames, styles, excep_data.to_dict("records")
 
@@ -1735,6 +1760,7 @@ tab_3_layout = html.Div(
                                          'justifyContent': 'center',
                                          'alignItems': 'center'})
                     ),
+
                     # html.Div(id="validation-output",
                     # style={"margin": "20px"}),
                     html.Div(
@@ -2000,10 +2026,9 @@ tab_4_layout = html.Div([
 
 @app.callback(
     Output('summary1-table-po', 'data'),
-    Input('vendor-name-dropdown', 'value'),
-    Input('family-code-dropdown', 'value')
+    Input('vendor-name-dropdown', 'value')
 )
-def update_summary_table_po(vendor_name, family_code):
+def update_summary_table_po(vendor_name):
     if vendor_name is not None:
         conn_pr = pyodbc.connect(
             'Driver={SQL Server};' + 'Server=' + configDict['server'] + ';' + 'Database=' + configDict['db'] + ';'
@@ -2011,7 +2036,7 @@ def update_summary_table_po(vendor_name, family_code):
         vendor_id_query = "SELECT [Vendor_Id] FROM " + configDict[
             'po_data_summary'] + " where Planner = ? and Vendor_Name = ?"
         performance_query = 'SELECT [Family_Code],[Family],[Location],[Week],[Year],[Date],[Inv],[SO],[PO],[Demand],[Receipt],[Inv$],[PO$],[SO$],[Receipt$],[LeadTime] FROM ' + \
-                            configDict['perf_data'] + ' where VendorId=?'
+                            configDict['perf_data'] + ' where Vendor_Id=?'
         global data
         vendor_id = pd.read_sql(vendor_id_query, conn_pr, params=[username, vendor_name])
         data = pd.read_sql(performance_query, conn_pr, params=[vendor_id.iloc[0][0]])
@@ -2058,7 +2083,7 @@ def display_perform_report(active_cell, vendor_name):
         vendor_id_query = "SELECT [Vendor_Id] FROM " + configDict[
             'po_data_summary'] + " where Planner = ? and Vendor_Name = ?"  # " where Planner = ?;"
         performance_query = 'SELECT [Family],[Location],[Week],[Year],[Date],[Inv],[SO],[PO],[Demand],[Receipt],[Inv$],[PO$],[SO$],[Receipt$],[LeadTime] FROM ' + \
-                            configDict['perf_data'] + ' where VendorId=?'
+                            configDict['perf_data'] + ' where Vendor_Id=?'
         vendor_id = pd.read_sql(vendor_id_query, conn_pr, params=[username, vendor_name])
         data = pd.read_sql(performance_query, conn_pr, params=[vendor_id.iloc[0][0]])
         return data.to_dict('records')
@@ -2085,4 +2110,4 @@ def render_content(tab, pathname):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, threaded=True)
+    app.run_server(debug=True, threaded=True, port=8040)
