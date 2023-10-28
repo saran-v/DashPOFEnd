@@ -176,6 +176,7 @@ app.layout = html.Div([
 ])
 
 
+
 @app.callback(
     Output('dropdown-loaded', 'data'),
     Input('url', 'pathname')
